@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Compras y Documentación - Gestión Logística</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-color: #e2e8f0;
+            
+            /* Colores de botones solicitados */
+            --btn-purchase: #2ecc71;
+            --btn-purchase-hover: #27ae60;
+            --btn-billing: #3498db;
+            --btn-billing-hover: #2980b9;
+            --btn-audit: #e67e22;
+            --btn-audit-hover: #d35400;
+            --btn-kpi: #9b59b6;
+            --btn-kpi-hover: #8e44ad;
+            
+            /* Alertas */
+            --alert-bg: #ebf5fb;
+            --alert-border: #3498db;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        header h1 {
+            font-size: 24pt;
+            color: #1a252f;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 11pt;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            font-size: 14pt;
+            margin-bottom: 15px;
+            color: #1a252f;
+            border-bottom: 2px solid #f1f2f6;
+            padding-bottom: 8px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 10.5pt;
+        }
+
+        .data-table th, .data-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        .badge-danger {
+            background-color: #fadbd8;
+            color: #c0392b;
+        }
+
+        .badge-success {
+            background-color: #d4efdf;
+            color: #27ae60;
+        }
+
+        .badge-warning {
+            background-color: #fdebd0;
+            color: #d35400;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 10pt;
+            transition: background-color 0.2s ease;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-purchase { background-color: var(--btn-purchase); }
+        .btn-purchase:hover { background-color: var(--btn-purchase-hover); }
+
+        .btn-billing { background-color: var(--btn-billing); }
+        .btn-billing:hover { background-color: var(--btn-billing-hover); }
+
+        .btn-audit { background-color: var(--btn-audit); }
+        .btn-audit:hover { background-color: var(--btn-audit-hover); }
+
+        .btn-kpi { background-color: var(--btn-kpi); }
+        .btn-kpi:hover { background-color: var(--btn-kpi-hover); }
+
+        /* Panel de Alertas en pantalla */
+        .alert-box {
+            background-color: var(--alert-bg);
+            border-left: 4px solid var(--alert-border);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 4px 4px 0;
+            display: none;
+            font-size: 10pt;
+        }
+
+        .alert-box.show {
+            display: block;
+        }
+
+        .info-list {
+            list-style: none;
+            margin-bottom: 15px;
+            font-size: 11pt;
+        }
+
+        .info-list li {
+            padding: 6px 0;
+            border-bottom: 1px dotted var(--border-color);
+        }
+
+        .info-list strong {
+            color: #34495e;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Dashboard de Compras y Documentación</h1>
+            <p>Sistema Operativo de Control de Inventarios, Facturación y Auditoría Logística</p>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <!-- SECCIÓN 1: ÓRDENES DE COMPRA AUTOMÁTICAS -->
+            <div class="card">
+                <h2>1. Órdenes de Compra Automáticas</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Stock Actual</th>
+                            <th>Límite Mínimo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Producto A</td>
+                            <td><strong>8</strong></td>
+                            <td>10</td>
+                            <td><span class="badge badge-danger">Stock Bajo</span></td>
+                        </tr>
+                        <tr>
+                            <td>Producto B</td>
+                            <td><strong>25</strong></td>
+                            <td>20</td>
+                            <td><span class="badge badge-success">OK</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="purchase-action-container">
+                    <!-- El botón aparecerá automáticamente ya que el Producto A está bajo el límite -->
+                    <button class="btn btn-purchase" onclick="generarOrdenCompra()">Generar Orden de Compra (Producto A)</button>
+                </div>
+                <div id="alert-purchase" class="alert-box"></div>
+            </div>
+
+            <!-- SECCIÓN 2: FACTURACIÓN DIGITAL -->
+            <div class="card">
+                <h2>2. Facturación Digital</h2>
+                <ul class="info-list">
+                    <li><strong>Cliente:</strong> AgroPerú SAC</li>
+                    <li><strong>Monto a Facturar:</strong> $1,200.00</li>
+                    <li><strong>Fecha de Entrega:</strong> 30/06/2026</li>
+                    <li><strong>Estado de Entrega:</strong> Entregado (Listo para facturar)</li>
+                </ul>
+                <button class="btn btn-billing" onclick="enviarFactura()">Crear y Enviar Factura Digital</button>
+                <div id="alert-billing" class="alert-box" style="border-left-color: var(--btn-billing);"></div>
+            </div>
+
+            <!-- SECCIÓN 3: AUDITORÍA DE FLETES -->
+            <div class="card">
+                <h2>3. Auditoría de Fletes</h2>
+                <ul class="info-list">
+                    <li><strong>Tarifa Contratada (Acuerdo):</strong> $500.00</li>
+                    <li><strong>Tarifa Cobrada (Factura Flete):</strong> $520.00</li>
+                    <li><strong>Desviación:</strong> <span style="color: #c0392b; font-weight: bold;">+$20.00 (Sobreprecio)</span></li>
+                </ul>
+                <button class="btn btn-audit" onclick="auditarFletes()">Ejecutar Auditoría Automática</button>
+                <div id="alert-audit" class="alert-box" style="border-left-color: var(--btn-audit);"></div>
+            </div>
+
+            <!-- SECCIÓN 4: REPORTES DE KPI -->
+            <div class="card">
+                <h2>4. Reportes de KPI (Métricas Diarias)</h2>
+                <p style="margin-bottom: 15px; color: var(--text-muted); font-size: 10pt;">
+                    Haga clic abajo para procesar y simular el reporte consolidado diario.
+                </p>
+                <button class="btn btn-kpi" onclick="generarReporteKPI()">Generar Reporte Diario de KPIs</button>
+                
+                <div id="kpi-report-container" style="display: none; margin-top: 20px;">
+                    <table class="data-table" style="background-color: #fcf8ff; border: 1px solid #e8daef;">
+                        <thead>
+                            <tr>
+                                <th>Métrica KPI</th>
+                                <th>Resultado Simulado</th>
+                                <th>Estado Objetivo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tiempo Promedio de Entrega</td>
+                                <td><strong>2 días</strong></td>
+                                <td><span class="badge badge-success">Cumplido</span></td>
+                            </tr>
+                            <tr>
+                                <td>Costo Promedio por Envío</td>
+                                <td><strong>$45.00</strong></td>
+                                <td><span class="badge badge-success">Dentro de Presupuesto</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="alert-kpi" class="alert-box" style="border-left-color: var(--btn-kpi);"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. Función para Órdenes de Compra Automáticas
+        function generarOrdenCompra() {
+            const mensaje = "🛒 [ORDEN DE COMPRA] Se ha generado automáticamente la orden de compra para reponer el stock del 'Producto A'. Proveedor notificado.";
+            
+            // Alerta nativa
+            alert(mensaje);
+            
+            // Mensaje en pantalla
+            const alertBox = document.getElementById('alert-purchase');
+            alertBox.innerText = mensaje;
+            alertBox.classList.add('show');
+        }
+
+        // 2. Función para Facturación Digital
+        function enviarFactura() {
+            const mensaje = "📄 [FACTURACIÓN] La factura digital por un monto de $1200 para el cliente 'AgroPerú SAC' ha sido generada con éxito y enviada a su correo electrónico institucional.";
+            
+            // Alerta nativa
+            alert(mensaje);
+            
+            // Mensaje en pantalla
+            const alertBox = document.getElementById('alert-billing');
+            alertBox.innerText = mensaje;
+            alertBox.classList.add('show');
+        }
+
+        // 3. Función para Auditoría de Fletes
+        function auditarFletes() {
+            const tarifaContratada = 500;
+            const tarifaCobrada = 520;
+            const desviacion = tarifaCobrada - tarifaContratada;
+            
+            let mensaje = `🔍 [AUDITORÍA DE FLETES] Discrepancia detectada.
+Tarifa Contratada: $${tarifaContratada}
+Tarifa Cobrada: $${tarifaCobrada}
+`;
+            
+            if (desviacion > 0) {
+                mensaje += `Resultado: ALERTA DESVIACIÓN. Se cobraron $${desviacion} adicionales fuera del acuerdo contractual. Se abrirá un ticket de reclamo automáticamente.`;
+            } else if (desviacion < 0) {
+                mensaje += `Resultado: Tarifa menor a la pactada. Ahorro de $${Math.abs(desviacion)}.`;
+            } else {
+                mensaje += `Resultado: Conciliación exitosa. Las tarifas coinciden perfectamente.`;
+            }
+            
+            // Alerta nativa
+            alert(mensaje);
+            
+            // Mensaje en pantalla
+            const alertBox = document.getElementById('alert-audit');
+            alertBox.innerText = mensaje;
+            alertBox.classList.add('show');
+        }
+
+        // 4. Función para Reportes de KPI
+        function generarReporteKPI() {
+            const mensaje = "📊 [REPORTE KPI] Métricas consolidadas del día de hoy calculadas correctamente. Mostrando tabla de desempeño en pantalla.";
+            
+            // Alerta nativa
+            alert(mensaje);
+            
+            // Mensaje en pantalla
+            const alertBox = document.getElementById('alert-kpi');
+            alertBox.innerText = mensaje;
+            alertBox.classList.add('show');
+            
+            // Mostrar la tabla simulada
+            document.getElementById('kpi-report-container').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
